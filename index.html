@@ -7,11 +7,14 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     :root { --primary: #00A651; --secondary: #FF6B00; --dark: #1a1a2e; --light: #f5f5f5; --white: #ffffff; --gray: #666; --success: #00C853; --warning: #FFC107; --danger: #FF5252; --gold: #FFD700; }
-    body { background: linear-gradient(135deg, #001A75 0%, #0033CC 100%); min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; padding: 20px; padding-bottom: 80px; }
-    .container { background: var(--white); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; overflow: hidden; margin-top: 20px; }
-    .app-creator { background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%); color: var(--white); padding: 15px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-    .app-creator .brand { font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .app-creator .tagline { font-size: 0.7rem; color: #aaa; margin-top: 3px; letter-spacing: 2px; text-transform: uppercase; }
+    body { background: linear-gradient(135deg, #001A75 0%, #0033CC 100%); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; padding-bottom: 80px; }
+    
+    /* Brand Header - Outside the card */
+    .brand-header { text-align: center; margin-bottom: 15px; width: 100%; max-width: 500px; }
+    .brand-header .brand { font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-shadow: 0 2px 10px rgba(255, 215, 0, 0.3); }
+    .brand-header .tagline { font-size: 0.7rem; color: rgba(255,255,255,0.8); margin-top: 3px; letter-spacing: 2px; text-transform: uppercase; }
+    
+    .container { background: var(--white); border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 100%; overflow: hidden; }
     .header { background: var(--dark); color: var(--white); padding: 25px; text-align: center; }
     .header h1 { font-size: 1.5rem; margin-bottom: 5px; }
     .header .subtitle { color: var(--primary); font-size: 0.9rem; }
@@ -55,8 +58,6 @@
     .notification-banner { background: var(--warning); color: var(--dark); padding: 15px; text-align: center; font-weight: 600; display: none; }
     .notification-banner.show { display: block; }
     .exact-time { font-size: 0.8rem; color: var(--gray); margin-top: 5px; }
-    
-    /* Premium Footer */
     .footer { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4a 100%); padding: 15px 20px; text-align: center; border-top: 2px solid var(--gold); z-index: 100; }
     .footer a { color: var(--gold); text-decoration: none; font-weight: 600; transition: all 0.3s; }
     .footer a:hover { color: #fff; text-shadow: 0 0 10px var(--gold); }
@@ -65,12 +66,13 @@
   </style>
 </head>
 <body>
+  <!-- Brand Header - Outside the card -->
+  <div class="brand-header">
+    <div class="brand">✦ Dammie Optimus Solutions ✦</div>
+    <div class="tagline">Premium Digital Solutions</div>
+  </div>
+  
   <div class="container">
-    <div class="app-creator">
-      <div class="brand">✦ Dammie Optimus Solutions ✦</div>
-      <div class="tagline">Premium Digital Solutions</div>
-    </div>
-    
     <div class="notification-banner" id="notificationBanner">⚠️ Some data plans are expiring soon!</div>
     <div class="header">
       <h1>📱 Data Expiry Tracker</h1>
@@ -132,9 +134,7 @@
   </div>
 
   <script>
-    // Auto-update year
     document.getElementById('year').textContent = new Date().getFullYear();
-    
     let dataPlans = JSON.parse(localStorage.getItem('dataPlans')) || [];
     if (dataPlans.length === 0) {
       dataPlans.push({ id: Date.now(), network: 'Glo', phone: '07053331253', dataAmount: '2.5GB', cost: 500, purchaseDate: '2026-03-01', purchaseTime: '03:12', validity: 2, planName: 'GloCafe Special', reminderHours: 24 });
@@ -160,11 +160,11 @@
       const expiry = new Date(expiryDate);
       const diff = expiry - now;
       if (diff <= 0) return { expired: true, text: 'EXPIRED' };
-      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const totalHours = Math.floor(diff / (1000 * 60 * 60));
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      if (hours < 24) return { expired: false, text: `${hours}h ${minutes}m left`, urgent: true };
-      const days = Math.floor(hours / 24);
-      const remainingHours = hours % 24;
+      if (totalHours < 24) return { expired: false, text: `${totalHours}h ${minutes}m left`, urgent: true };
+      const days = Math.floor(totalHours / 24);
+      const remainingHours = totalHours % 24;
       return { expired: false, text: `${days}d ${remainingHours}h left`, urgent: days < 2 };
     }
 
