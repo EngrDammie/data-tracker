@@ -103,8 +103,10 @@
         </div>
         <div class="form-row">
           <div class="form-group"><label>Purchase Date</label><input type="date" id="purchaseDate"></div>
-          <div class="form-group"><label>Validity (days)</label><input type="number" id="validity" placeholder="e.g., 30"></div>
+          <div class="form-group"><label>Purchase Time</label><input type="time" id="purchaseTime"></div>
         </div>
+        <div class="form-row">
+          <div class="form-group"><label>Validity (days)</label><input type="number" id="validity" placeholder="e.g., 30"></div>
         <div class="form-group">
           <label>Remind Me Before Expiry</label>
           <select id="reminderTime">
@@ -132,8 +134,12 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Set default date
+    // Set default date and time
     document.getElementById('purchaseDate').valueAsDate = new Date();
+    const now = new Date();
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById('purchaseTime').value = `${hours}:${minutes}`;
 
     // Check API and load data
     async function init() {
@@ -211,7 +217,7 @@
               <span class="countdown ${statusClass}">${timeLeft.text}</span>
               <span class="expiry-date">${timeLeft.expired ? 'Expired!' : 'Expires: ' + formatDateTime(plan.expiryDate)}</span>
             </div>
-            ${plan.cost ? `<div class="exact-time">₦${plan.cost} | ${plan.validity} days</div>` : ''}
+            ${plan.cost ? `<div class="exact-time">₦${plan.cost} | ${plan.validity} days | Purchased: ${plan.purchaseTime || '00:00'}</div>` : ''}
             <div class="actions">
               <button class="btn btn-primary" onclick="renewData('${plan.id}')">🔄 Renew</button>
               <button class="btn btn-danger" onclick="deleteData('${plan.id}')">🗑️ Delete</button>
@@ -231,11 +237,12 @@
       const dataAmount = document.getElementById('dataAmount').value;
       const cost = document.getElementById('cost').value;
       const purchaseDate = document.getElementById('purchaseDate').value;
+      const purchaseTime = document.getElementById('purchaseTime').value;
       const validity = document.getElementById('validity').value;
       
       if (!phone || !dataAmount || !validity) { alert('Please fill in all required fields!'); return; }
       
-      const newPlan = { network, phone, dataAmount, cost: cost || 0, purchaseDate, validity: parseInt(validity) };
+      const newPlan = { network, phone, dataAmount, cost: cost || 0, purchaseDate, purchaseTime, validity: parseInt(validity) };
       
       if (useAPI) {
         try {
@@ -252,7 +259,7 @@
         }
       } else {
         newPlan.id = Date.now().toString();
-        const expiryDate = new Date(purchaseDate);
+        const expiryDate = new Date(purchaseDate + 'T' + purchaseTime);
         expiryDate.setDate(expiryDate.getDate() + parseInt(validity));
         newPlan.expiryDate = expiryDate.toISOString();
         dataPlans.push(newPlan);

@@ -40,10 +40,13 @@ app.get('/api/data', (req, res) => {
 
 // Add new data plan
 app.post('/api/data', (req, res) => {
-  const { network, phone, dataAmount, cost, purchaseDate, validity } = req.body;
+  const { network, phone, dataAmount, cost, purchaseDate, purchaseTime, validity } = req.body;
   
-  const expiryDate = new Date(purchaseDate);
-  expiryDate.setDate(expiryDate.getDate() + parseInt(validity));
+  // Calculate expiry date with time
+  const purchaseDateTime = purchaseTime 
+    ? new Date(purchaseDate + 'T' + purchaseTime)
+    : new Date(purchaseDate + 'T00:00');
+  purchaseDateTime.setDate(purchaseDateTime.getDate() + parseInt(validity));
   
   const newPlan = {
     id: Date.now().toString(),
@@ -52,8 +55,9 @@ app.post('/api/data', (req, res) => {
     dataAmount,
     cost: parseFloat(cost),
     purchaseDate,
+    purchaseTime: purchaseTime || '00:00',
     validity: parseInt(validity),
-    expiryDate: expiryDate.toISOString(),
+    expiryDate: purchaseDateTime.toISOString(),
     createdAt: new Date().toISOString()
   };
   
