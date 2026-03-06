@@ -1,0 +1,14 @@
+{
+  "name": "data-tracker",
+  "version": "1.0.0",
+  "description": "Data Expiry Tracker with Backend API",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "reminder": "node reminder-bot.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
