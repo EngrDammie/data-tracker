@@ -147,11 +147,12 @@
 
     document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Set default date and time
+    // Set default date and time (Nigerian Time - WAT/UTC+1)
     document.getElementById('purchaseDate').valueAsDate = new Date();
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    // Get current time in Nigeria (UTC+1)
+    const now = new Date(Date.now() + 3600000); // Add 1 hour for WAT
+    const hours = String(now.getUTCHours()).padStart(2, '0');
+    const minutes = String(now.getUTCMinutes()).padStart(2, '0');
     document.getElementById('purchaseTime').value = `${hours}:${minutes}`;
 
     // Check API and load data
@@ -197,8 +198,14 @@
       return { expired: false, text: `${days}d ${remainingHours}h left`, urgent: days < 2 };
     }
 
+    const NIGERIA_TZ = 'Africa/Lagos';
+    
+    function toNigeriaTime(date) {
+      return new Date(date).toLocaleString('en-GB', { timeZone: NIGERIA_TZ, day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+    }
+    
     function formatDateTime(date) { 
-      return new Date(date).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }); 
+      return toNigeriaTime(date); 
     }
     function getNetworkColor(network) { 
       const colors = { 'MTN': '#FFB800', 'Airtel': '#0096D6', 'Glo': '#001A75', '9mobile': '#00A651' }; 
